@@ -1,0 +1,1 @@
+docker run -p 8082:8082 -v `pwd`/default.yaml:/uptime/config/default.yaml -d uptime

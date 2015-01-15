@@ -1,0 +1,9 @@
+#!/bin/sh
+
+sv start mongodb || exit 1
+
+while ! nc -vz localhost 27017;do sleep 3; done
+cd /uptime
+
+exec 2>&1
+exec node app
