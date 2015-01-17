@@ -34,11 +34,6 @@ RUN cd uptime && \
     npm install net-ping && \
     npm install
 
-RUN /usr/bin/mongod -f /etc/mongod.conf & \
-    while ! nc -vz localhost 27017;do sleep 3; done && \
-    mongo uptime --eval "db.addUser('uptime','uptime')" && \
-    /usr/bin/mongod -f /etc/mongod.conf --shutdown
-
 #Add runit services
 ADD sv /etc/service 
 
