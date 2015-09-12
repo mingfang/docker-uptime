@@ -1,0 +1,8 @@
+[template]
+src = "kubernetes.conf.tmpl"
+dest = "/mongo.js"
+keys = [
+    "/registry/services/endpoints/default/"
+]
+
+reload_cmd = "mongo uptime < /mongo.js"

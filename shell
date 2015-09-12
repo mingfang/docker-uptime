@@ -1,1 +1,1 @@
-docker run -p 8082:8082 -v `pwd`/data:/var/lib/mongodb -v `pwd`/default.yaml:/uptime/config/default.yaml -v `pwd`:/docker -w /docker --rm -i -t uptime /bin/bash
+docker run -e ETCD_HOST=192.168.1.160 -v `pwd`/etc/confd:/etc/confd -p 8082:8082 -v `pwd`/data:/var/lib/mongodb -v `pwd`/default.yaml:/uptime/config/default.yaml -v `pwd`:/docker -w /docker --rm -i -t uptime /bin/bash

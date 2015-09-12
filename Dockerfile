@@ -4,25 +4,26 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update
 RUN locale-gen en_US en_US.UTF-8
 ENV LANG en_US.UTF-8
+RUN echo "export PS1='\e[1;31m\]\u@\h:\w\\$\[\e[0m\] '" >> /root/.bashrc
 
 #Runit
 RUN apt-get install -y runit 
-CMD /usr/sbin/runsvdir-start
+CMD export > /etc/envvars && /usr/sbin/runsvdir-start
+RUN echo 'export > /etc/envvars' >> /root/.bashrc
 
 #Utilities
-RUN apt-get install -y vim less net-tools inetutils-ping wget curl git telnet nmap socat dnsutils netcat tree htop unzip sudo software-properties-common
+RUN apt-get install -y vim less net-tools inetutils-ping wget curl git telnet nmap socat dnsutils netcat tree htop unzip sudo software-properties-common jq psmisc
 
 RUN apt-get install -y build-essential
 
 #MongoDB
 RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10 && \
-    echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' > /etc/apt/sources.list.d/mongodb.list && \
+    echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/3.0 multiverse" > /etc/apt/sources.list.d/mongodb-org-3.0.list && \
     apt-get update
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y mongodb-org
-RUN mkdir -p /data/db
+RUN apt-get install -y mongodb-org
 
 #Node
-RUN curl http://nodejs.org/dist/v0.10.26/node-v0.10.26-linux-x64.tar.gz | tar xz
+RUN curl http://nodejs.org/dist/v0.12.7/node-v0.12.7-linux-x64.tar.gz | tar xz
 RUN mv node* node && \
     ln -s /node/bin/node /usr/local/bin/node && \
     ln -s /node/bin/npm /usr/local/bin/npm
@@ -34,6 +35,14 @@ RUN cd uptime && \
     npm install net-ping && \
     npm install
 
+#Confd
+RUN wget -O /usr/local/bin/confd  https://github.com/kelseyhightower/confd/releases/download/v0.10.0/confd-0.10.0-linux-amd64 && \
+    chmod +x /usr/local/bin/confd
+
+COPY etc/confd /etc/confd
+COPY test.sh /
+COPY mongod.conf /etc/mongod.conf
+
 #Add runit services
-ADD sv /etc/service 
+COPY sv /etc/service 
 

@@ -1,0 +1,31 @@
+{{range $endpointJson := getvs "/registry/services/endpoints/default/*"}}
+  {{$endpoint := json $endpointJson}}
+  //{{$endpoint.metadata.name}}
+  {{if gt (len $endpoint.subsets) 0}}
+    {{$subset := index $endpoint.subsets 0}}
+    {{$port := index $subset.ports 0}}
+    {{$address := index $subset.addresses 0}}
+    {{$ip := $address.ip}}
+    {{$targetRef := $address.targetRef}}
+    {{if $targetRef}}
+
+db.checks.findAndModify({
+  query: {"name": "{{$targetRef.name}}"},
+  update: { $setOnInsert: {"type" : "http", "name" : "{{$targetRef.name}}", "url" : "http://{{$ip}}:{{$port.port}}", "tags" : ["{{$endpoint.metadata.name}}"]}},
+  new: true,
+  upsert: true
+})
+
+    {{else}}
+
+db.checks.findAndModify({
+  query: {"name": "{{$endpoint.metadata.name}}"},
+  update: { $setOnInsert: {"type" : "http", "name" : "{{$endpoint.metadata.name}}", "url" : "http://{{$ip}}:{{$port.port}}", "tags" : ["{{$endpoint.metadata.name}}"]}},
+  new: true,
+  upsert: true
+})
+
+    {{end}}
+
+  {{end}}
+{{end}}
