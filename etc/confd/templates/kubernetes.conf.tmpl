@@ -2,7 +2,7 @@
   {{$pod := json $podJson}}
   //{{$pod.metadata.name}}
   {{range $container := $pod.spec.containers}}
-  {{if $container.livenessProbe.httpGet}}
+  {{if and $pod.status.podIP $container.livenessProbe.httpGet}}
 
 db.checks.findAndModify({
   query: {"name": "{{$pod.metadata.name}}"},
