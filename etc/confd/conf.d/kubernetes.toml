@@ -5,4 +5,5 @@ keys = [
     "/registry/services/endpoints/default/"
 ]
 
+check_cmd  = "mongo --eval 'db.version()'"
 reload_cmd = "mongo uptime < /mongo.js"
