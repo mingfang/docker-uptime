@@ -2,7 +2,7 @@
 src = "kubernetes.conf.tmpl"
 dest = "/mongo.js"
 keys = [
-    "/registry/services/endpoints/default/"
+    "/registry/pods/default"
 ]
 
 check_cmd  = "mongo --eval 'db.version()'"

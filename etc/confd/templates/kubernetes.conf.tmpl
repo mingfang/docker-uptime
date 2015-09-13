@@ -1,31 +1,16 @@
-{{range $endpointJson := getvs "/registry/services/endpoints/default/*"}}
-  {{$endpoint := json $endpointJson}}
-  //{{$endpoint.metadata.name}}
-  {{if gt (len $endpoint.subsets) 0}}
-    {{$subset := index $endpoint.subsets 0}}
-    {{$port := index $subset.ports 0}}
-    {{$address := index $subset.addresses 0}}
-    {{$ip := $address.ip}}
-    {{$targetRef := $address.targetRef}}
-    {{if $targetRef}}
+{{range $podJson := getvs "/registry/pods/default/*"}}
+  {{$pod := json $podJson}}
+  //{{$pod.metadata.name}}
+  {{range $container := $pod.spec.containers}}
+  {{if $container.livenessProbe.httpGet}}
 
 db.checks.findAndModify({
-  query: {"name": "{{$targetRef.name}}"},
-  update: { $setOnInsert: {"type" : "http", "name" : "{{$targetRef.name}}", "url" : "http://{{$ip}}:{{$port.port}}", "tags" : ["{{$endpoint.metadata.name}}"]}},
+  query: {"name": "{{$pod.metadata.name}}"},
+  update: { $setOnInsert: {"type" : "{{$container.livenessProbe.httpGet.scheme}}", "name" : "{{$pod.metadata.name}}", "url" : "http://{{$pod.status.podIP}}:{{$container.livenessProbe.httpGet.port}}{{$container.livenessProbe.httpGet.path}}", "tags" : ["{{$pod.metadata.labels.name}}"], "interval": 5000}},
   new: true,
   upsert: true
 })
 
-    {{else}}
-
-db.checks.findAndModify({
-  query: {"name": "{{$endpoint.metadata.name}}"},
-  update: { $setOnInsert: {"type" : "http", "name" : "{{$endpoint.metadata.name}}", "url" : "http://{{$ip}}:{{$port.port}}", "tags" : ["{{$endpoint.metadata.name}}"]}},
-  new: true,
-  upsert: true
-})
-
-    {{end}}
-
+  {{end}}
   {{end}}
 {{end}}
