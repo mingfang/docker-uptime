@@ -37,7 +37,7 @@ RUN cd uptime && \
     npm install
 
 #Confd
-RUN wget -O /usr/local/bin/confd  https://github.com/kelseyhightower/confd/releases/download/v0.10.0/confd-0.10.0-linux-amd64 && \
+RUN wget -O /usr/local/bin/confd  https://github.com/kelseyhightower/confd/releases/download/v0.11.0/confd-0.11.0-linux-amd64 && \
     chmod +x /usr/local/bin/confd
 
 COPY default.yaml /uptime/config/
